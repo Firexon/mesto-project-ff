@@ -4,6 +4,7 @@ const placesList = document.querySelector('.places__list');
 function cardBuilder(dataCards, cardRemove) {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   cardElement.querySelector('.card__image').src = dataCards.link;
+  cardElement.querySelector('.card__image').alt = 'Фотография ' + dataCards.name;
   cardElement.querySelector('.card__title').textContent = dataCards.name;
   const deleteButton = cardElement.querySelector('.card__delete-button');
   deleteButton.addEventListener('click', function () {
