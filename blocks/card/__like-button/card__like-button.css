@@ -13,8 +13,25 @@
   -ms-transition: 0.3s;
   -o-transition: 0.3s;
   transition: 0.3s;
+  z-index: 1; /* Устанавливаем над счётчиком */
 }
 
 .card__like-button:hover {
   opacity: 0.6;
+}
+
+.card__like-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.card__like-count {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 15.73px;
+  color: #000000;
+  margin-top: 3px;
 }
