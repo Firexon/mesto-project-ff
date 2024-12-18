@@ -17,12 +17,3 @@ function escClose(evt) {
     }
   }
 }
-
-export function setLoadingState(button, isLoading) {
-  if (isLoading) {
-    button.dataset.originalText = button.textContent;
-    button.textContent = "Сохранение...";
-  } else {
-    button.textContent = button.dataset.originalText;
-  }
-}

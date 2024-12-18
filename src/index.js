@@ -2,12 +2,7 @@ import "../pages/index.css";
 import { buildCard, cardRemove, cardLike } from "./card.js";
 // import { initialCards } from "./cards.js";
 import { openModal, closeModal } from "./modal.js";
-import {
-  enableValidation,
-  clearValidation,
-  configValidation,
-  setLoadingState,
-} from "./validation.js";
+import { enableValidation, clearValidation } from "./validation.js";
 import {
   getUserData,
   getCards,
@@ -31,7 +26,7 @@ const editPopup = document.querySelector(".popup_type_edit");
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
-const formElement = document.querySelector(".popup__form");
+const editProfileForm = document.forms["edit-profile"];
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
 
@@ -46,6 +41,16 @@ const imgLinkInput = document.querySelector(".popup__input_type_url");
 const cardImagePopup = document.querySelector(".popup_type_image");
 const ImageInsidePopup = cardImagePopup.querySelector(".popup__image");
 const popupCaption = cardImagePopup.querySelector(".popup__caption");
+
+// конфиг валидации
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
 
 // анимация всех Popup + закрытие по оверлею
 const allPopups = document.querySelectorAll(".popup");
@@ -64,8 +69,24 @@ closeButtons.forEach((button) => {
   button.addEventListener("click", () => closeModal(button.closest(".popup")));
 });
 
+// изменение кнопки при прогрузке
+const setLoadingState = (formElement, isLoading) => {
+  const buttonElement = formElement.querySelector(
+    validationConfig.submitButtonSelector,
+  );
+  if (buttonElement) {
+    if (isLoading) {
+      buttonElement.dataset.originalText = buttonElement.textContent;
+      buttonElement.textContent = "Сохранение...";
+    } else {
+      buttonElement.textContent =
+        buttonElement.dataset.originalText || "Сохранить";
+    }
+  }
+};
+
 // включили валидацию
-enableValidation(configValidation);
+enableValidation(validationConfig);
 
 // прогрузка карточек
 let userId;
@@ -104,7 +125,7 @@ updateAvatarForm.addEventListener("submit", avatarFormSubmit);
 
 profileImageElement.addEventListener("click", () => {
   openModal(avatarPopup);
-  clearValidation(updateAvatarForm, configValidation);
+  clearValidation(updateAvatarForm, validationConfig);
   updateAvatarForm.reset();
 });
 
@@ -113,7 +134,8 @@ function avatarFormSubmit(evt) {
   setLoadingState(updateAvatarForm, true);
 
   updateAvatar(avatarUrlInput.value)
-    .then(() => {
+    .then((res) => {
+      profileImageElement.src = res.avatar;
       closeModal(avatarPopup);
     })
     .catch((err) => console.error(`Ошибка при обновлении аватара: ${err}`))
@@ -123,19 +145,18 @@ function avatarFormSubmit(evt) {
 }
 
 // edit модальное окно
-formElement.addEventListener("submit", handleFormSubmit);
+editProfileForm.addEventListener("submit", handleFormSubmit);
 
 editButton.addEventListener("click", function () {
-  clearValidation(formElement, configValidation);
   openModal(editPopup);
-
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
+  clearValidation(editProfileForm, validationConfig);
 });
 
 function handleFormSubmit(evt) {
   evt.preventDefault();
-  setLoadingState(formElement, true);
+  setLoadingState(editProfileForm, true);
 
   editProfile(nameInput.value, jobInput.value)
     .then((updatedUserData) => {
@@ -147,7 +168,7 @@ function handleFormSubmit(evt) {
       console.error(`Ошибка при сохранении данных профиля: ${err}`),
     )
     .finally(() => {
-      setLoadingState(formElement, false);
+      setLoadingState(editProfileForm, false);
     });
 }
 
@@ -155,9 +176,9 @@ function handleFormSubmit(evt) {
 addPlaceForm.addEventListener("submit", addPlaceSubmit);
 
 newCardButton.addEventListener("click", function (evt) {
-  clearValidation(addPlaceForm, configValidation);
   openModal(newCardPopup);
   addPlaceForm.reset();
+  clearValidation(addPlaceForm, validationConfig);
 });
 
 function addPlaceSubmit(evt) {
